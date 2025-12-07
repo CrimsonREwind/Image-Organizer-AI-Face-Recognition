@@ -17,12 +17,21 @@ def create_app(config_name=None):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     
+    # Get allowed origins from environment or use defaults
+    allowed_origins = os.environ.get('ALLOWED_ORIGINS', '').split(',')
+    default_origins = ["http://localhost:3000", "http://localhost:5173"]
+    
+    # Filter out empty strings and combine with defaults
+    allowed_origins = [origin.strip() for origin in allowed_origins if origin.strip()]
+    all_origins = list(set(default_origins + allowed_origins))
+    
     # Initialize extensions
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000", "http://localhost:5173"],
-            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH"],
-            "allow_headers": ["Content-Type", "Authorization"]
+            "origins": all_origins,
+            "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
         }
     })
     
