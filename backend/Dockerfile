@@ -1,26 +1,20 @@
-# Use pre-built image with dlib and face_recognition already installed
-FROM animcogn/face_recognition:latest
+FROM python:3.11-slim
+
+# Install system dependencies for face_recognition
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    libopenblas-dev \
+    liblapack-dev \
+    libx11-dev \
+    libgtk-3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy requirements and install additional dependencies (face_recognition already installed)
+# Install Python dependencies
 COPY requirements.txt .
-
-# Upgrade pip first, then install dependencies with compatible versions for Python 3.8
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir \
-    Flask==3.0.0 \
-    Flask-CORS==4.0.0 \
-    Flask-PyMongo==2.3.0 \
-    python-dotenv==1.0.0 \
-    pymongo==4.6.1 \
-    dnspython==2.4.2 \
-    Pillow==10.1.0 \
-    cloudinary==1.37.0 \
-    Werkzeug==3.0.1 \
-    gunicorn==21.2.0 \
-    python-dateutil==2.8.2 \
-    requests
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
